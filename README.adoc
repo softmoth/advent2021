@@ -25,10 +25,20 @@ Working with BTreeSet was interesting. For part 1 (solution not kept) I just kep
 
 This is my first time actually working with *ndarray*. Once I figured out the basics, it was trivial to use `board.axis_iter()` to check both across and down. So it worked out well, and was good to get my feet wet with the library.
 
-I'm starting to get used to *nom* for parsing text, and feel like I can get it into a data structure fairly efficiently, but I'm guessing there's a better way still. At first I used nested for loops and explict indexing into a `[u8;BOARD_SIZE]` fixed array. I had to use `fold_many_m_n()` in the inner loop to avoid `nom` allocating an intermediate `Vec`. Using vectors instead isn't too bad; it addsabout 50 bytes of allocation per board parsed. Mapping that with `Array::from_shape_vec()` adds another 200 bytes or so.
+I'm starting to get used to *nom* for parsing text, and feel like I can get it into a data structure fairly efficiently, but I'm guessing there's a better way still. At first I used nested for loops and explicit indexing into a `[u8;BOARD_SIZE]` fixed array. I had to use `fold_many_m_n()` in the inner loop to avoid `nom` allocating an intermediate `Vec`. Using vectors instead isn't too bad; it adds about 50 bytes of allocation per board parsed. Mapping that with `Array::from_shape_vec()` adds another 200 bytes or so.
 
 But it took me a while to get to compile with each change of organization. It's good practice for managing ownership, etc.
 
 Part 2 was pretty straightforward. Instead of stopping after the first win, just process all of them. I kept every board that won, in order, then it's easy to grab the first and last for the answer.
 
-// vim:set tw=0:
+## Day 5
+
+Part one uses similar techniques to Day 4. Parsing with nom continues to be pleasant. I'm getting more familiar with ndarray.
+
+Most of the awkwardness is that I'm still learning how to specify the types when needed, how to use the libraries, and so forth. For example, I spent a fair amount of time trying to understand why `.map_inplace()` wasn't getting a mutable ref to the value, even though I'd declared the array as `mut`. I realized I needed `.slice_mut()` instead of `.slice()`, which would be obvious to a more seasoned Rust developer.
+
+I did a little bit of code organizing, while still keeping each day self-contained. Now `main` just slurps the input and shows the result of a `process()` function. All the guts are below the fold.
+
+Part two doesn't add much interesting. I can't find a way to iterate over a diagonal slice in ndarray (`SliceInfoElem` sensibly doesn't handle that), so I just write the imperative loop explicitly.
+
+// vim:set spell tw=0:
