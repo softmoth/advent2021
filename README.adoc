@@ -61,4 +61,11 @@ Also, clippy is great! It found a place where `.ok_or()` was unconditionally cre
 
 So it's safe to say that this was a good learning experience! Remember that `--release` isn't just about optimization level! Rust makes the tools to check when needed very easy to use.
 
+
+# Day 7
+
+I started out trying to use ndarray-stats, thinking there must be some statistical method that would just give me the right answer. But I couldn't find such a thing.
+
+So I decided to just brute force it, and it turns out to be pretty quick regardless. The Rust bits aren't too interesting, although it was again good practice for working with different integer types (e.g., I didn't know about `.unsigned_abs()` before).
+
 // vim:set spell tw=0:

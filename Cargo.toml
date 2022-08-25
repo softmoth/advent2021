@@ -9,7 +9,6 @@ dhat = "0.3.0"
 itertools = "0.10.3"
 ndarray = "0.15.6"
 nom = "7.1.1"
-rayon = "1.5.3"
 
 [profile.release]
 debug = 1
