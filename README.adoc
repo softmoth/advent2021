@@ -53,7 +53,12 @@ For part 1, the parsing was trivial. The solution was pretty clear, but I wanted
 
 I thought of implementing Iterator for it, so I could do `school.iter().take(80).tail()` or similar, but that didn't really work out.
 
+For part 2, I had to use u64 for all the counts. I was using --release to build, so I didn't even get a panic at runtime. I've switched to use `.checked_add()` to catch it in `.advance()`, but the final `.sum()` isn't checked and can still overflow.
 
+I extended the test to 442 days, which is the max that will fit into a u64 result: 18_353_315_898_976_047_013 fish.
 
+Also, clippy is great! It found a place where `.ok_or()` was unconditionally creating an Err() object that was never used, and recommended `.ok_or_else()` instead. It wasn't exactly a memory leak, but was ruining my dhat score. `:-)`
+
+So it's safe to say that this was a good learning experience! Remember that `--release` isn't just about optimization level! Rust makes the tools to check when needed very easy to use.
 
 // vim:set spell tw=0:
