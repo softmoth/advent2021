@@ -5,11 +5,13 @@ The main site is https://adventofcode.com/2021[].
 I was inspired to do it by
 https://www.youtube.com/playlist?list=PLWtPciJ1UMuAJ-To7dMk71e-aiwBLg_Id[Chris Biscardi].
 
+
 ## Day 1
 
 I learned `std::io::stdin().lines()`, which handles locking automatically in recent Rust.
 
 Chris Biscardi introduced me to *dhat*, a very simple heap profiler. So far, that along with `/usr/bin/time` is enough to do some basic testing.
+
 
 ## Day 2
 
@@ -17,9 +19,11 @@ I rewrote this several times. First with a naïve `split_whitespace()` parser, a
 
 I did learn how to return an enum value from a function, and then call it later. The trick is to cast the enum value explicitly to `fn(i32) -> Command`. Otherwise it looks like `fn(i32) -> Command {Command::Down}` (i.e., it's too specific) and the compiler thinks each value is of a different type. That was satisfying to get working.
 
+
 ## Day 3
 
 Working with BTreeSet was interesting. For part 1 (solution not kept) I just kept a count of how many entries had each bit set. But part 2 required storing all of the entries and whittling them down. At first I tried `.filter_drain()`, but then I found that an initial `.partition()` of the set allows the two questions to be answered without needing to duplicate any of the entries.
+
 
 ## Day 4
 
@@ -31,6 +35,7 @@ But it took me a while to get to compile with each change of organization. It's 
 
 Part 2 was pretty straightforward. Instead of stopping after the first win, just process all of them. I kept every board that won, in order, then it's easy to grab the first and last for the answer.
 
+
 ## Day 5
 
 Part one uses similar techniques to Day 4. Parsing with nom continues to be pleasant. I'm getting more familiar with ndarray.
@@ -40,5 +45,15 @@ Most of the awkwardness is that I'm still learning how to specify the types when
 I did a little bit of code organizing, while still keeping each day self-contained. Now `main` just slurps the input and shows the result of a `process()` function. All the guts are below the fold.
 
 Part two doesn't add much interesting. I can't find a way to iterate over a diagonal slice in ndarray (`SliceInfoElem` sensibly doesn't handle that), so I just write the imperative loop explicitly.
+
+
+## Day 6
+
+For part 1, the parsing was trivial. The solution was pretty clear, but I wanted to avoid unnecessary copying, so instead of shifting or rotating a Vec of numbers, I made my own data structure to track the index. This means there's only a few simple additions needed, rather than moving N values. I guess with only 8 lifetimes, the copying would be minimal, but this felt right.
+
+I thought of implementing Iterator for it, so I could do `school.iter().take(80).tail()` or similar, but that didn't really work out.
+
+
+
 
 // vim:set spell tw=0:
