@@ -68,4 +68,13 @@ I started out trying to use ndarray-stats, thinking there must be some statistic
 
 So I decided to just brute force it, and it turns out to be pretty quick regardless. The Rust bits aren't too interesting, although it was again good practice for working with different integer types (e.g., I didn't know about `.unsigned_abs()` before).
 
+
+# Day 8
+
+Part 1 went pretty smoothly, just using strings for storing the segments. Converting it to use `bitvec` instead took a bit of working out as I've never used that library before. It was pretty trivial once I did find out how to create the `BitArr!()` type and so forth. And the values can be used with bitwise arithmetic operators, so that's perfect.
+
+Part 2 is much more of a learning opportunity. Especially it's been fiddly in getting the right dereferencing of values inside of filter closures, etc. Doing higher-order functions is still tricky for me; I know exactly what I want to do, but getting the right levels of indirection and the right type signatures is fiddly. It's good practice.
+
+My solution is alright, but I feel like I might be missing some underlying organization that could make it much better.
+
 // vim:set spell tw=0:
