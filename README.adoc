@@ -84,4 +84,11 @@ This day I spent a lot of time trying out `impl<'a> Index for Heightmap<'a>`,  b
 
 Other than that, the implementation went fairly smoothly. The Itertools `.cartesian_product` method is a nice luxury.
 
+
+# Day 10
+
+I have a compulsion to do everything in one pass where possible. I even tried the `apply` crate, to structure `process()` with no top-level `let` statements. But it was a bit too cute, and I think it's more legible in this case without it.
+
+I still find the guts of this to be hard to read. Pulling some of that out into smaller functions would help, but the worst of it is the match statement in `check_line()`, and it is hard to simplify. Maybe the SyntaxCheck type isn't the best fundamental representation for the state.
+
 // vim:set spell tw=0:
