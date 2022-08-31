@@ -77,4 +77,11 @@ Part 2 is much more of a learning opportunity. Especially it's been fiddly in ge
 
 My solution is alright, but I feel like I might be missing some underlying organization that could make it much better.
 
+
+# Day 9
+
+This day I spent a lot of time trying out `impl<'a> Index for Heightmap<'a>`,  before abandoning it and just using a `.at((x, y))` method instead. Since I wanted to try using a reference to the input itself as the data, I wanted `.at()` to convert the ASCII values to numbers on the fly, and this isn't possible with Index. Index has to return a reference into the data, it can't return an owned value.
+
+Other than that, the implementation went fairly smoothly. The Itertools `.cartesian_product` method is a nice luxury.
+
 // vim:set spell tw=0:
