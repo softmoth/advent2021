@@ -91,4 +91,15 @@ I have a compulsion to do everything in one pass where possible. I even tried th
 
 I still find the guts of this to be hard to read. Pulling some of that out into smaller functions would help, but the worst of it is the match statement in `check_line()`, and it is hard to simplify. Maybe the SyntaxCheck type isn't the best fundamental representation for the state.
 
+
+# Day 11
+
+I spent most of my time on this trying to get a `.neighbors8_mut()` Iterator impl working on my DigitGrid struct. I gave up on that after quite a bit of messing about and reading through much of the https://rust-unofficial.github.io/too-many-lists/[Too Many Lists] book again.
+
+Then I had an off-by-one error that took me a while to find, so I was firing the octopus when it hit 9 rather than 10. I suspected my neighbor code and everything else before I realized it was just I'd read the problem wrong.
+
+Part 2 was easy once part 1 was done.
+
+I was not thrilled with the heap performance. The max usage was under 5K, but total allocated was 2M, largely from the neighbors() function collecting into a Vec just so it can stuff it into an array. Creating the array on the stack and just filling it manually got it down to 900K, and sped it up considerably. I think most of the allocation is now in `step()`'s `VecDeque`, which makes sense.
+
 // vim:set spell tw=0:
