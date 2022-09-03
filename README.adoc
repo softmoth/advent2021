@@ -102,4 +102,9 @@ Part 2 was easy once part 1 was done.
 
 I was not thrilled with the heap performance. The max usage was under 5K, but total allocated was 2M, largely from the neighbors() function collecting into a Vec just so it can stuff it into an array. Creating the array on the stack and just filling it manually got it down to 900K, and sped it up considerably. I think most of the allocation is now in `step()`'s `VecDeque`, which makes sense.
 
+
+# Day 12
+
+I kept getting stuck trying to formulate the iterative version directly for some reason. So I finally took a break and coded a recursive version in Perl. Once I had that working, I coded the same thing in Rust. The result used 7.5M of memory and made 150M total allocations, and took almost 4 times as long as the Perl version. Hmmm....
+
 // vim:set spell tw=0:
