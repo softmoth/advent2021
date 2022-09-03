@@ -33,7 +33,6 @@ type CaveID = u8;
 struct Caves {
     by_name: HashMap<String, CaveID>,
     data: Vec<Cave>,
-    start_id: CaveID,
 }
 
 impl Caves {
@@ -41,13 +40,11 @@ impl Caves {
         let mut caves = Self {
             by_name: HashMap::new(),
             data: vec![],
-            start_id: 0,
         };
         for line in input.lines() {
             let (a, b) = line.split_once('-').unwrap();
             caves.connect(a, b);
         }
-        caves.start_id = *caves.by_name.get("start").unwrap();
 
         caves
     }
@@ -75,59 +72,76 @@ impl Caves {
         self.data[b as usize].exits.push(a);
     }
 
-    fn walk(&self, cave: CaveID, mut path: Vec<CaveID>, goal: CaveID) -> Vec<Vec<CaveID>> {
-        // Safeguard against recursion mistake
-        if path.len() > 1_000 {
-            unreachable!("Gah! Recursion busted! {path:?}");
-        }
+    fn walk(&self, start: CaveID, goal: CaveID) -> Vec<Vec<CaveID>> {
+        let mut solutions = vec![];
+        let mut todo = vec![];
+        todo.push(vec![start]);
 
-        path.push(cave);
+        'todo: while let Some(path) = todo.pop() {
+            let cave = *path.last().unwrap();
 
-        if cave == goal {
-            // Found the end, no need to check the exits
-            return vec![path];
-        }
-
-        if self.data[cave as usize].is_small {
-            /* PART 1
-            // Don't re-enter a small room
-            if path.contains(&exit) {
-                continue;
-            }
-            */
-
-            // Never return to the starting room
-            if cave == self.start_id && path.len() > 1 {
-                return vec![];
+            if cave == goal {
+                // Found the end, no need to check the exits
+                solutions.push(path);
+                continue 'todo;
             }
 
-            // Ensure the path isn't revisiting too many small rooms
-            let mut got_a_double = false;
-            let mut seen = HashSet::<CaveID>::new();
-            for &p in &path {
-                if self.data[p as usize].is_small {
-                    if seen.contains(&p) {
-                        if got_a_double {
-                            // Already had a double visit; bail
-                            return vec![];
+            if self.data[cave as usize].is_small {
+                // PART 1
+                // Don't re-enter a small room
+                //if path[..path.len() - 1].contains(&cave) {
+                //    continue 'todo;
+                //}
+
+                // Never return to the starting room
+                if cave == start && path.len() > 1 {
+                    continue 'todo;
+                }
+
+                // Ensure the path isn't revisiting too many small rooms
+                let mut got_a_double = false;
+                let mut seen = HashSet::<CaveID>::new();
+                for &p in &path {
+                    if self.data[p as usize].is_small {
+                        if seen.contains(&p) {
+                            if got_a_double {
+                                // Already had a double visit; bail
+                                continue 'todo;
+                            }
+
+                            // This is the first double-visit
+                            got_a_double = true;
+                        } else {
+                            // First appearance of this small room
+                            seen.insert(p);
                         }
-
-                        // This is the first double-visit
-                        got_a_double = true;
-                    } else {
-                        // First appearance of this small room
-                        seen.insert(p);
                     }
                 }
+
+                if todo.len() > 1_000 || path.len() > 1_000 {
+                    for (i, c) in self.data.iter().enumerate() {
+                        eprintln!("{}: {} {} {:?}", i, c.name, c.is_small, &c.exits);
+                    }
+
+                    for p in &todo {
+                        eprintln!("{:?}", p);
+                    }
+
+                    dbg!(&seen);
+                    dbg!(&got_a_double);
+                    unimplemented!("todo {}, path {}", todo.len(), path.len());
+                }
             }
+
+            // Still here? OK, then walk cave's exits
+            todo.extend(self.data[cave as usize].exits.iter().map(|&e| {
+                let mut p = path.clone();
+                p.push(e);
+                p
+            }));
         }
 
-        // Still here? OK, then walk cave's exits
-        self.data[cave as usize]
-            .exits
-            .iter()
-            .flat_map(|&e| self.walk(e, path.clone(), goal))
-            .collect()
+        solutions
     }
 
     fn exhaust(&self, start: &str, end: &str) -> Vec<Vec<CaveID>> {
@@ -138,7 +152,7 @@ impl Caves {
         let start = *self.by_name.get(start).unwrap();
         let end = *self.by_name.get(end).unwrap();
 
-        self.walk(start, vec![], end)
+        self.walk(start, end)
     }
 }
 
@@ -195,5 +209,15 @@ dhat: At t-end:  1,024 bytes in 1 blocks
 
 0.26user 0.00system 0:00.26elapsed 100%CPU (0avgtext+0avgdata 11036maxresident)k
 0inputs+0outputs (0major+3012minor)pagefaults 0swaps
+
+
+Iterative approach with while() and push() / pop():
+Result: 107395
+dhat: Total:     77,390,981 bytes in 2,819,708 blocks
+dhat: At t-gmax: 5,627,562 bytes in 107,455 blocks
+dhat: At t-end:  1,024 bytes in 1 blocks
+
+0.17user 0.00system 0:00.17elapsed 100%CPU (0avgtext+0avgdata 8384maxresident)k
+0inputs+0outputs (0major+1687minor)pagefaults 0swaps
 
 */

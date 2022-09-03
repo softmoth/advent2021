@@ -100,7 +100,10 @@ Then I had an off-by-one error that took me a while to find, so I was firing the
 
 Part 2 was easy once part 1 was done.
 
-I was not thrilled with the heap performance. The max usage was under 5K, but total allocated was 2M, largely from the neighbors() function collecting into a Vec just so it can stuff it into an array. Creating the array on the stack and just filling it manually got it down to 900K, and sped it up considerably. I think most of the allocation is now in `step()`'s `VecDeque`, which makes sense.
+I was not thrilled with the heap performance. The max usage was under 5K, but total allocated was 2M, largely from the neighbors() function collecting into a Vec just so it can stuff it into an array. Creating the array on the stack and just filling it manually got it down to 900K, and sped it up considerably.
+I think most of the allocation is now in
+`step()`'s
+`VecDeque`, which makes sense.
 
 
 # Day 12
@@ -108,5 +111,7 @@ I was not thrilled with the heap performance. The max usage was under 5K, but to
 I kept getting stuck trying to formulate the iterative version directly for some reason. So I finally took a break and coded a recursive version in Perl. Once I had that working, I coded the same thing in Rust. The result used 7.5M of memory and made 150M total allocations, and took almost 4 times as long as the Perl version. Hmmm... TIMTOWTDI?
 
 As for the memory, that looks like less than the Perl version. The 4x time increase is due to dhat; without instrumentation it's significantly faster than Perl's version. This took me a while to figure out, though. So, as should be expected, if there are enough allocations happening then dhat has a big performance impact.
+
+Converting it to an iterative solution went smoothly once I had the recursive version working. Somehow I just was unwilling to put so many clones of paths on the stack, but that is how it's done. Instead of `.clone(), .push()`, an immutable list could just push new head's all sharing the same tail. Maybe a CoW list of this sort exists in Rust, but I didn't find it.
 
 // vim:set spell tw=0:
