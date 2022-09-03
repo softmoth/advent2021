@@ -105,6 +105,8 @@ I was not thrilled with the heap performance. The max usage was under 5K, but to
 
 # Day 12
 
-I kept getting stuck trying to formulate the iterative version directly for some reason. So I finally took a break and coded a recursive version in Perl. Once I had that working, I coded the same thing in Rust. The result used 7.5M of memory and made 150M total allocations, and took almost 4 times as long as the Perl version. Hmmm....
+I kept getting stuck trying to formulate the iterative version directly for some reason. So I finally took a break and coded a recursive version in Perl. Once I had that working, I coded the same thing in Rust. The result used 7.5M of memory and made 150M total allocations, and took almost 4 times as long as the Perl version. Hmmm... TIMTOWTDI?
+
+As for the memory, that looks like less than the Perl version. The 4x time increase is due to dhat; without instrumentation it's significantly faster than Perl's version. This took me a while to figure out, though. So, as should be expected, if there are enough allocations happening then dhat has a big performance impact.
 
 // vim:set spell tw=0:

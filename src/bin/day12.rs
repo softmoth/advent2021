@@ -22,7 +22,7 @@ fn main() {
 
 fn process(input: &str) -> usize {
     let caves = Caves::new(input);
-    dbg!(&caves);
+    //dbg!(&caves);
     let paths = caves.exhaust("start", "end");
     paths.len()
 }
@@ -61,7 +61,7 @@ impl Caves {
             self.data.push(Cave {
                 id,
                 name: name.to_owned(),
-                is_big: name.chars().next().unwrap().is_ascii_uppercase(),
+                is_small: name.chars().next().unwrap().is_ascii_lowercase(),
                 exits: Vec::new(),
             });
             id
@@ -77,7 +77,9 @@ impl Caves {
 
     fn walk(&self, cave: CaveID, mut path: Vec<CaveID>, goal: CaveID) -> Vec<Vec<CaveID>> {
         // Safeguard against recursion mistake
-        assert!(path.len() < 1_000);
+        if path.len() > 1_000 {
+            unreachable!("Gah! Recursion busted! {path:?}");
+        }
 
         path.push(cave);
 
@@ -86,15 +88,7 @@ impl Caves {
             return vec![path];
         }
 
-        if self.data[cave as usize].is_big {
-            // Don't follow the same edge in the same direction twice
-            if path[..path.len() - 1]
-                .windows(2)
-                .any(|w| w == [*path.last().unwrap(), cave])
-            {
-                return vec![];
-            }
-        } else {
+        if self.data[cave as usize].is_small {
             /* PART 1
             // Don't re-enter a small room
             if path.contains(&exit) {
@@ -111,7 +105,7 @@ impl Caves {
             let mut got_a_double = false;
             let mut seen = HashSet::<CaveID>::new();
             for &p in &path {
-                if !self.data[p as usize].is_big {
+                if self.data[p as usize].is_small {
                     if seen.contains(&p) {
                         if got_a_double {
                             // Already had a double visit; bail
@@ -153,14 +147,53 @@ impl Caves {
 struct Cave {
     id: CaveID,
     name: String,
-    is_big: bool,
+    is_small: bool,
     exits: Vec<CaveID>,
 }
 
 /*
-Perl solution, part 2:
+Perl solution:
 107395
 2.86user 0.03system 0:02.90elapsed 99%CPU (0avgtext+0avgdata 112984maxresident)k
 0inputs+0outputs (0major+27031minor)pagefaults 0swaps
+
+
+Rust, recursive and mutable reference to solutions vec:
+Answer = 107395
+dhat: Total:     544,283,056 bytes in 2,819,624 blocks
+dhat: At t-gmax: 42,800,364 bytes in 107,411 blocks
+dhat: At t-end:  1,024 bytes in 1 blocks
+
+NOTE: Timing is much slower with dhat, because of the many allocations!
+
+Timing with dhat-heap:
+5.45user 5.70system 0:11.15elapsed 100%CPU (0avgtext+0avgdata 19056maxresident)k
+0inputs+120outputs (0major+4830minor)pagefaults 0swaps
+
+And without:
+0.32user 0.01system 0:00.33elapsed 99%CPU (0avgtext+0avgdata 45900maxresident)k
+0inputs+0outputs (0major+11074minor)pagefaults 0swaps
+
+Recursive, with return .flat_map(walk).collect():
+dhat: Total:     615,999,280 bytes in 3,123,800 blocks
+dhat: At t-gmax: 44,696,032 bytes in 107,399 blocks
+dhat: At t-end:  1,024 bytes in 1 blocks
+
+Answer = 107395
+0.31user 0.00system 0:00.32elapsed 99%CPU (0avgtext+0avgdata 47508maxresident)k
+0inputs+0outputs (0major+12268minor)pagefaults 0swaps
+
+So, memory usage did increase using collect() rather than a mut ref, but it doesn't affect the run
+time significantly.
+
+
+Using u8 IDs instead of &str names (still recursive w/ collect()):
+Result: 107395
+dhat: Total:     149,104,236 bytes in 3,123,879 blocks
+dhat: At t-gmax: 7,523,660 bytes in 107,440 blocks
+dhat: At t-end:  1,024 bytes in 1 blocks
+
+0.26user 0.00system 0:00.26elapsed 100%CPU (0avgtext+0avgdata 11036maxresident)k
+0inputs+0outputs (0major+3012minor)pagefaults 0swaps
 
 */

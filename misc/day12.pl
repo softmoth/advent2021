@@ -29,15 +29,7 @@ sub walk {
         return;
     }
 
-    if (/^[A-Z]/) {
-        # Big room, make sure we've never gone there from here
-        for (my $i = 1; $i < @$path - 1; ++$i) {
-            if ($path->[$i] eq $cave && $path->[$i - 1] eq $path->[$#$path]) {
-                return;
-            }
-        }
-    }
-    else {
+    if ($cave !~ /^[A-Z]/) {
         # PART 1
         # Little room make sure we haven't been there before
         #foreach my $room (@$path) {
@@ -76,7 +68,8 @@ sub walk {
 
 walk("start", []);
 
-#note "@$_" for @solutions;
+#sort @solutions;
+#say "@$_" for sort @solutions;
 
 say scalar(@solutions);
 

@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.62"
+apply = "0.3.0"
 bitvec = "1.0.1"
 dhat = "0.3.0"
 itertools = "0.10.3"
