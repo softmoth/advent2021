@@ -119,4 +119,9 @@ Converting it to an iterative solution went smoothly once I had the recursive ve
 
 Finally, this one went smoothly. A HashSet represents the sparse grid, and while there is some duplication of logic between the fold-left and fold-up cases, it's simple enough that factoring it out into some object doesn't make sense, I think. I'm going to take this one as a win and move on.
 
+
+# Day 14
+
+I did Part 1 with a full Vec representation of the polymer, and it is fine for the 10 steps. It of course failed badly on steps > 20 or so.
+
 // vim:set spell tw=0:
