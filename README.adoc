@@ -114,4 +114,9 @@ As for the memory, that looks like less than the Perl version. The 4x time incre
 
 Converting it to an iterative solution went smoothly once I had the recursive version working. Somehow I just was unwilling to put so many clones of paths on the stack, but that is how it's done. Instead of `.clone(), .push()`, an immutable list could just push new head's all sharing the same tail. Maybe a CoW list of this sort exists in Rust, but I didn't find it.
 
+
+# Day 13
+
+Finally, this one went smoothly. A HashSet represents the sparse grid, and while there is some duplication of logic between the fold-left and fold-up cases, it's simple enough that factoring it out into some object doesn't make sense, I think. I'm going to take this one as a win and move on.
+
 // vim:set spell tw=0:
