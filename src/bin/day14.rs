@@ -22,46 +22,73 @@ fn main() {
 
 fn process(input: &str) -> usize {
     let (template, rules) = parse(input);
-    eprintln!("{:?}", rules);
-    eprintln!("{:?}", template);
-    let mut polymer = template;
-    for _step in 0..10 {
+    //eprintln!("{:?}", rules);
+    //eprintln!("{:?}", template);
+    let mut polymer = init_polymer(&template);
+    for _step in 0..40 {
         polymer = apply_rules(&polymer, &rules);
-        //eprintln!("{:?}", polymer);
+        score_polymer(&template, &polymer);
     }
 
-    score_polymer(&polymer)
+    score_polymer(&template, &polymer)
 }
 
-fn score_polymer(polymer: &Polymer) -> usize {
+fn score_polymer(template: &str, polymer: &Polymer) -> usize {
     let mut elements = HashMap::<char, usize>::new();
-    for &p in polymer {
-        *elements.entry(p).or_default() += 1;
+
+    // This double-counts (almost) every element
+    for (&[a, b], n) in polymer {
+        *elements.entry(a).or_default() += n;
+        *elements.entry(b).or_default() += n;
     }
 
-    let mut elements = elements.iter().collect::<Vec<_>>();
+    // The first and last element in the template weren't counted double; fix that
+    assert!(template.len() > 1);
+    let mut template = template.chars();
+    let (first, last) = (template.next().unwrap(), template.last().unwrap());
+    elements.entry(first).and_modify(|v| *v += 1);
+    elements.entry(last).and_modify(|v| *v += 1);
+
+    // Get the un-doubled counts, sorted
+    let mut elements = elements.iter().map(|(k, v)| (k, v / 2)).collect::<Vec<_>>();
     elements.sort_by_key(|e| e.1);
 
+    //eprintln!("{:?}", elements);
     elements[elements.len() - 1].1 - elements[0].1
 }
 
-type Polymer = Vec<char>;
+type Polymer = HashMap<[char; 2], usize>;
 type Rules = HashMap<[char; 2], char>;
 
-fn apply_rules(polymer: &Polymer, rules: &Rules) -> Polymer {
+fn init_polymer(template: &str) -> Polymer {
+    let mut polymer: Polymer = HashMap::new();
+    for w in template.chars().collect::<Vec<_>>().windows(2) {
+        *polymer.entry([w[0], w[1]]).or_default() += 1;
+    }
     polymer
-        .windows(2)
-        .flat_map(|w| [Some(w[0]), rules.get(w).copied()])
-        .chain(Some(polymer.last().copied()))
-        .flatten()
-        .collect()
 }
 
-fn parse(input: &str) -> (Polymer, Rules) {
+fn apply_rules(polymer: &Polymer, rules: &Rules) -> Polymer {
+    let mut polymer_new = HashMap::new();
+    polymer
+        .iter()
+        .flat_map(|(&pair, &count)| {
+            rules
+                .get(&pair)
+                .map_or([(pair, count), (pair, 0)], |&insert| {
+                    [([pair[0], insert], count), ([insert, pair[1]], count)]
+                })
+        })
+        .for_each(|(pair, count)| *polymer_new.entry(pair).or_default() += count);
+    //eprintln!("{:?}", &polymer_new);
+    polymer_new
+}
+
+fn parse(input: &str) -> (String, Rules) {
     let mut lines = input.lines();
 
-    let template: Polymer = lines.next().unwrap().chars().collect();
-    assert!(!template.is_empty());
+    let template: String = lines.next().unwrap().to_owned();
+    assert!(template.len() > 1);
 
     let blank = lines.next().unwrap();
     assert!(blank.is_empty());
@@ -89,5 +116,14 @@ dhat: At t-end:  1,024 bytes in 1 blocks
 
 0.00user 0.00system 0:00.00elapsed 100%CPU (0avgtext+0avgdata 2128maxresident)k
 0inputs+0outputs (0major+138minor)pagefaults 0swaps
+
+Part 2:
+Result: 4302675529689
+dhat: Total:     205,367 bytes in 419 blocks
+dhat: At t-gmax: 8,010 bytes in 6 blocks
+dhat: At t-end:  1,024 bytes in 1 blocks
+
+0.00user 0.00system 0:00.00elapsed 0%CPU (0avgtext+0avgdata 2100maxresident)k
+0inputs+0outputs (0major+95minor)pagefaults 0swaps
 
 */
