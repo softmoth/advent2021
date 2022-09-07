@@ -124,4 +124,11 @@ Finally, this one went smoothly. A HashSet represents the sparse grid, and while
 
 I did Part 1 with a full Vec representation of the polymer, and it is fine for the 10 steps. It of course failed badly on steps > 20 or so.
 
+
+# Day 15
+
+I first coded up a naive search implementation. See misc/day15-naive.pl. It works for the small test sample, but is overwhelmed by even the Part 1 problem size. It's just too wasteful.
+
+Of course, the real solution is to use A*. The petgraph crate makes this easy. It uses 4M of RAM for Part 1, 85M for the 5x5 Part 2, and 1G of RAM for a 15x15 repeat of Part 2. It'd be nice to see how much better a custom A* implementation for just this problem could be.
+
 // vim:set spell tw=0:
