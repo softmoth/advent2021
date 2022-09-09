@@ -131,4 +131,6 @@ I first coded up a naive search implementation. See misc/day15-naive.pl. It work
 
 Of course, the real solution is to use A*. The petgraph crate makes this easy. It uses 4M of RAM for Part 1, 85M for the 5x5 Part 2, and 1G of RAM for a 15x15 repeat of Part 2. It'd be nice to see how much better a custom A* implementation for just this problem could be.
 
+My custom A* implementation does save significantly on memory usage, but winds up using more CPU, so the timings are about equal. But I was able to do a 50x50 grid with 2G of memory allocations (under 1G max size), and it could be optimized more I'm sure.
+
 // vim:set spell tw=0:
