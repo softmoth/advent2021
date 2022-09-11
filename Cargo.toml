@@ -12,6 +12,8 @@ itertools = "0.10.3"
 ndarray = "0.15.6"
 nom = "7.1.1"
 petgraph = "0.6.2"
+strum = "0.24.1"
+strum_macros = "0.24.3"
 
 [profile.release]
 debug = 1

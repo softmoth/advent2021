@@ -137,8 +137,8 @@ My custom A* implementation does save significantly on memory usage, but winds u
 # Day 16
 
 I found it surprisingly difficult to cleanly convert `"12abc"` into a
-`Vec<u8>` of bits. One nice gift of the challenge was getting to know `.by_ref()`, which I had forgotten about. And the fact that the `.remainder()` of `chunks()` can be retrieved before the chunks are iterated over is very convenient. It means you don't even need `.by_ref()` since you have the remainder already and don't need to re-examine the iterator after mapping over it.
+`Vec<u8>` of bits. One nice result of the struggle was getting to know `.by_ref()`, which I had forgotten about. And the fact that the `.remainder()` of `chunks()` can be retrieved before the chunks are iterated over is very convenient. It means you don't even need `.by_ref()` since you have the remainder already and don't need to re-examine the iterator after mapping over it.
 
-Once past that, the `BitEater` struct came together fairly easily, using a conventional imperative style.
+Once past that, the `BitEater` struct came together fairly easily, using a conventional imperative style to do the bit twiddling. The rest of the problem was fairly straightforward with that in place, using Rust's enum types to model the tree of packets.
 
 // vim:set spell tw=0:
