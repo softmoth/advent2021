@@ -133,4 +133,12 @@ Of course, the real solution is to use A*. The petgraph crate makes this easy. I
 
 My custom A* implementation does save significantly on memory usage, but winds up using more CPU, so the timings are about equal. But I was able to do a 50x50 grid with 2G of memory allocations (under 1G max size), and it could be optimized more I'm sure.
 
+
+# Day 16
+
+I found it surprisingly difficult to cleanly convert `"12abc"` into a
+`Vec<u8>` of bits. One nice gift of the challenge was getting to know `.by_ref()`, which I had forgotten about. And the fact that the `.remainder()` of `chunks()` can be retrieved before the chunks are iterated over is very convenient. It means you don't even need `.by_ref()` since you have the remainder already and don't need to re-examine the iterator after mapping over it.
+
+Once past that, the `BitEater` struct came together fairly easily, using a conventional imperative style.
+
 // vim:set spell tw=0:
