@@ -1,50 +1,58 @@
-#![feature(trait_alias)]
+//#![feature(trait_alias)]
 
-use anyhow::{anyhow, Result};
-
-use combine::{
-    eof, many1, optional,
-    parser::char::{char, digit, space, spaces, string},
-    stream::position,
-    EasyParser, Parser, Stream,
-};
-
-trait CharStream = Stream<Token = char>;
+use anyhow::Result;
 
 type Pos = (i32, i32);
 
 #[derive(PartialEq, Eq, Debug, Clone)]
-struct Target {
-    x1: i32,
-    y1: i32,
-    x2: i32,
-    y2: i32,
+pub struct Target {
+    pub x1: i32,
+    pub y1: i32,
+    pub x2: i32,
+    pub y2: i32,
 }
 
-fn integer<Input: CharStream>() -> impl Parser<Input, Output = i32> {
-    (optional(char('-')), many1(digit())).map(|(sign, digits): (_, String)| {
-        sign.map(|_| -1).unwrap_or(1) * digits.parse::<i32>().unwrap()
-    })
-}
+peg::parser! {
+    grammar target_parser() for str {
+        rule _ -> ()
+            = quiet!{[' ' | '\t']*} {}
 
-fn target_dimension<Input: CharStream>(axis: char) -> impl Parser<Input, Output = Pos> {
-    (char(axis), char('='), integer(), string(".."), integer()).map(|(_, _, a, _, b)| (a, b))
-}
+        rule __() -> ()
+            = quiet!{[' ' | '\t']+} {}
 
-fn target<Input: CharStream>() -> impl Parser<Input, Output = Target> {
-    (
-        (string("target area:"), space(), spaces()),
-        target_dimension('x'),
-        (char(','), space(), spaces()),
-        target_dimension('y'),
-        (spaces(), eof()),
-    )
-        .map(|(_, x_range, _, y_range, _)| Target {
-            x1: x_range.0,
-            y1: y_range.0,
-            x2: x_range.1,
-            y2: y_range.1,
-        })
+        rule integer() -> i32
+            = sign:"-"? num:['0'..='9']+ {
+                num.into_iter().collect::<String>().parse::<i32>().unwrap() * sign.map(|_| -1).unwrap_or(1)
+            }
+
+        // Is there a more straightforward way to match a parameter?
+        // Is there a way to get the expected character into the error message &str?
+        rule axis_label(axis: char)
+            = [c] {?
+                (c == axis).then_some(()).ok_or("axis label")
+            }
+
+        rule target_dim(axis: char) -> Pos
+            =  axis_label(axis) _ "=" _ from:integer() _ ".." _ to:integer() {
+                (from, to)
+            }
+
+        rule eol()
+            = "\r"? "\n"
+
+        pub rule target() -> Target
+            = "target" __ "area" _ ":" _
+                x:target_dim('x') _ "," _
+                y:target_dim('y') _ eol()?
+            {
+                Target {
+                    x1: x.0,
+                    y1: y.0,
+                    x2: x.1,
+                    y2: y.1,
+                }
+            }
+    }
 }
 
 #[cfg(test)]
@@ -60,10 +68,7 @@ fn main() -> Result<()> {
 }
 
 fn process(input: &str) -> Result<()> {
-    let (target, _) = target()
-        .easy_parse(position::Stream::new(input))
-        .map_err(|e| anyhow!("Parse error {e}"))?;
-
+    let target = target_parser::target(input)?;
     eprintln!("{:?}", &target);
 
     Ok(())
