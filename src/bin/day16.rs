@@ -1,7 +1,14 @@
 use anyhow::{anyhow, bail, Result};
 use strum_macros::FromRepr;
 
+#[cfg(feature = "dhat-heap")]
+#[global_allocator]
+static ALLOC: dhat::Alloc = dhat::Alloc;
+
 fn main() -> Result<()> {
+    #[cfg(feature = "dhat-heap")]
+    let _profiler = dhat::Profiler::new_heap();
+
     let input = std::fs::read_to_string("inputs/day16.txt")?;
     let mut bits = BitEater::new(&input)?;
     let packet = get_packet(&mut bits)?;
@@ -207,6 +214,9 @@ mod tests {
 
     #[test]
     fn biteater_new() -> Result<()> {
+        #[cfg(feature = "dhat-heap")]
+        let _profiler = dhat::Profiler::new_heap();
+
         let mut bits = BitEater::new("D2FE28")?;
         eprintln!("{:?}", bits);
         assert_eq!(bits.eat(3)?, 6);

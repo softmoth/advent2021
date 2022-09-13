@@ -141,4 +141,15 @@ I found it surprisingly difficult to cleanly convert `"12abc"` into a
 
 Once past that, the `BitEater` struct came together fairly easily, using a conventional imperative style to do the bit twiddling. The rest of the problem was fairly straightforward with that in place, using Rust's enum types to model the tree of packets.
 
+
+# Day 17
+
+I started this by learning the `combine` library for parsing. I then tried `rust-peg` as well. I think I prefer `nom` to both, mainly due to the feeling that it's actively maintained. I really like the look of `pom`, but it seems abandoned and probably incomplete.
+
+Anyways, once I had played with parsing for a bit, I got stuck figuring out Part 1. I was missing the key insight that it is simple to know that the projectile crosses zero at the same rate it was launched. So, if the initial *y* velocity is *vy0*, then after *2 vy0* steps, *y* == *-vy0*. I cheated and looked at someone else's code, and once I saw how short their Part 1 solution was, it put me on the right track.
+
+Part 2 was easy after that, since I'd already sorted out the minimum and maximum X velocities when exploring Part 1.
+
+One minor Rust problem I had was trying to convert from `f64` to `i32`. `f64::ceil()` returns a `f64`, predictably. But so does `.truncate()` and `.round`. There's nothing that implements `From<f64>`. Using `foo_f64 as i32` works fine, and *clippy does not complain*. This https://www.reddit.com/r/learnrust/comments/hn4ck9/comment/fx96rkh/?context=3[seems like a glaring omission].
+
 // vim:set spell tw=0:
