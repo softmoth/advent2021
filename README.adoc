@@ -152,4 +152,9 @@ Part 2 was easy after that, since I'd already sorted out the minimum and maximum
 
 One minor Rust problem I had was trying to convert from `f64` to `i32`. `f64::ceil()` returns a `f64`, predictably. But so does `.truncate()` and `.round`. There's nothing that implements `From<f64>`. Using `foo_f64 as i32` works fine, and *clippy does not complain*. This https://www.reddit.com/r/learnrust/comments/hn4ck9/comment/fx96rkh/?context=3[seems like a glaring omission].
 
+
+# Day 18
+
+Parsing into a tree of SNum::{Pair, Term} nodes is easy enough with peg, but I think it might be nice to try keeping each Snailfish number in a u64: each term will fit into 4 bits, and at 4 levels deep there are 2^4 = 16 terms.
+
 // vim:set spell tw=0:
